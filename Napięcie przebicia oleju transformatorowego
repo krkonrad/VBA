@@ -1,0 +1,81 @@
+Sub clean()
+    Dim ws As Worksheet
+    For Each ws In ThisWorkbook.Worksheets
+        ws.Cells.Clear
+    Next ws
+End Sub
+Sub cw4pim()
+ 'Czyszczenie arkusza przed przetwarzaniem danych
+    clean
+    
+    ' Dodanie nazw kolumn
+    With ThisWorkbook.Sheets(1)
+        .Cells(1, 1).Value = "Nr pomiaru"
+        .Cells(1, 2).Value = "Wartość pomiaru [kV]"
+        .Cells(1, 3).Value = "Wartość średnia pomiaru [kV]"
+        .Cells(1, 4).Value = "Średnie odchylenie standardowe [kV]"
+        .Cells(1, 5).Value = "Względne odchylenie standardowe [%]"
+        
+        ' Ustawienie szerokości kolumn
+        .Columns(1).AutoFit
+        .Columns(2).AutoFit
+        .Columns(3).AutoFit
+        .Columns(4).AutoFit
+        .Columns(5).AutoFit
+    End With
+    Dim ScoursOfMeasurement() As Double
+    Dim AverageOfVoltage, sum, varianceSum, AverageStandardVariation, RelativeStandardDeviation As Double
+    Dim AmountOfMeasurement As Integer
+    Dim i As Integer
+    Dim userInput As String
+   
+    Do
+        userInput = InputBox("Wprowadź ilość pomiarów:", "Ilość pomiarów napięcia przebicia oleju transformatorowego", "Podaj liczbę całkowitą dodatnią")
+        ' Sprawdzenie, czy użytkownik anulował InputBox
+        If userInput = "" Then Exit Sub
+        ' Sprawdzenie, czy podano liczbę całkowitą dodatnią
+        If IsNumeric(userInput) And Val(userInput) > 0 And Int(userInput) = userInput Then
+            AmountOfMeasurement = CInt(userInput)
+            Exit Do ' Jeśli warunek jest spełniony, wyjdź z pętli
+           
+        Else
+            MsgBox "Podano niepoprawną wartość. Podaj liczbę całkowitą dodatnią."
+        End If
+    Loop
+    ReDim ScoursOfMeasurement(1 To AmountOfMeasurement)
+    ' Pętla wczytująca pomiary
+    For i = 1 To AmountOfMeasurement
+        ScoursOfMeasurement(i) = InputBox("Podaj pomiar " & i & ":")
+        Next i
+    For i = 1 To AmountOfMeasurement
+         Range("A" & i + 1).Value = i
+        Next i
+    For i = 1 To AmountOfMeasurement
+        Range("B" & i + 1).Value = ScoursOfMeasurement(i)
+    Next i
+' Obliczenie sumy danych
+    sum = 0
+    For i = 1 To AmountOfMeasurement
+        sum = sum + ScoursOfMeasurement(i)
+    Next i
+' Obliczenie średniej
+    AverageOfVoltage = sum / AmountOfMeasurement
+    Range("C2").Value = AverageOfVoltage
+    ' Obliczenie sumy kwadratów różnic od średniej
+        varianceSum = 0
+        For i = 1 To AmountOfMeasurement
+            varianceSum = varianceSum + (ScoursOfMeasurement(i) - Average) ^ 2
+        Next i
+      ' Obliczenie odchylenia standardowego z korektą Bessela
+        AverageStandardVariation = Sqr(varianceSum / (AmountOfMeasurement - 1))
+        Range("D2").Value = AverageStandardVariation
+         ' Obliczenie odchylenia standardowego z korektą Bessela względne
+            RelativeStandardDeviation = (AverageOfVoltage / AverageStandardVariation) * 100
+        Range("E2").Value = RelativeStandardDeviation
+End Sub
+
+
+
+    
+
+
