@@ -4,13 +4,21 @@ Sub clean()
         ws.Cells.Clear
     Next ws
 End Sub
-Sub cw4pim()
+
+Sub OlejTransformatorowy()
+  Dim targetSheetName As String
+    targetSheetName = "OlejTransformatorowy" ' Nowa nazwa arkusza
+    
+    ' Sprawdzenie, czy aktywny arkusz to arkusz o nazwie "OlejTransformatorowy"
+    If ActiveSheet.Name <> targetSheetName Then
+        MsgBox "To makro można uruchomić tylko w arkuszu o nazwie ""OlejTransformatorowy"".", vbExclamation, "Błąd"
+        Exit Sub
+    End If
  'Czyszczenie arkusza przed przetwarzaniem danych
     clean
-    
     ' Dodanie nazw kolumn
     With ThisWorkbook.Sheets(1)
-        .Cells(1, 1).Value = "Nr pomiaru"
+        .Cells(1, 1).Value = "Numer pomiaru"
         .Cells(1, 2).Value = "Wartość pomiaru [kV]"
         .Cells(1, 3).Value = "Wartość średnia pomiaru [kV]"
         .Cells(1, 4).Value = "Średnie odchylenie standardowe [kV]"
@@ -73,9 +81,5 @@ Sub cw4pim()
             RelativeStandardDeviation = (AverageOfVoltage / AverageStandardVariation) * 100
         Range("E2").Value = RelativeStandardDeviation
 End Sub
-
-
-
-    
 
 
