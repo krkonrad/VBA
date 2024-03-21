@@ -1,0 +1,103 @@
+Sub clean()
+    Dim ws As Worksheet
+    For Each ws In ThisWorkbook.Worksheets
+        ws.Cells.Clear
+    Next ws
+End Sub
+Sub PapierKablowy()
+ 'Czyszczenie arkusza przed przetwarzaniem danych
+    clean
+    
+With ThisWorkbook.Sheets(1)
+    .Cells(2, 1).Value = "Numer pomiaru"
+    .Cells(2, 2).Value = "Grubość kartki paieru [mm]"
+    .Cells(2, 3).Value = "Średnia Grubość kartki paieru [mm]"
+    .Cells(2, 4).Value = "Numer pomiaru"
+    .Cells(2, 5).Value = "Ilość warstw papieru [m]"
+    .Cells(2, 6).Value = "Napięcie pierwotne [v]"
+    .Cells(2, 7).Value = "Przekładnia zwojowa transformatora"
+    .Cells(2, 8).Value = "Napięcie perzebicia [kV]"
+    .Cells(2, 9).Value = "Wartość środkowa napięcia przebicia [kV]"
+    .Cells(2, 10).Value = "Wytrzymałość elektryczna [kV/mm]"
+    .Columns(1).AutoFit
+    .Columns(2).AutoFit
+    .Columns(3).AutoFit
+    .Columns(4).AutoFit
+    .Columns(5).AutoFit
+    .Columns(6).AutoFit
+    .Columns(7).AutoFit
+    .Columns(8).AutoFit
+    .Columns(9).AutoFit
+    .Columns(10).AutoFit
+    .Cells(2, 12).Value = "Numer pomiaru"
+    .Cells(2, 13).Value = "Ilość warstw papieru [m]"
+    .Cells(2, 14).Value = "Napięcie pierwotne [v]"
+    .Cells(2, 15).Value = "Przekładnia zwojowa transformatora"
+    .Cells(2, 16).Value = "Napięcie perzebicia [kV]"
+    .Cells(2, 17).Value = "Wartość środkowa napięcia przebicia [kV]"
+    .Cells(2, 18).Value = "Wytrzymałość elektryczna [kV/mm]"
+    .Columns(12).AutoFit
+    .Columns(13).AutoFit
+    .Columns(14).AutoFit
+    .Columns(15).AutoFit
+    .Columns(16).AutoFit
+    .Columns(17).AutoFit
+    .Columns(18).AutoFit
+End With
+   Dim IlolscPapieruMokrego, IlolscPapieruSuchego, IloscPomiaruMokrego, IlośćPomiaruSuchego, IlePomiarowGrubosci As Integer
+   Dim i As Integer
+   Dim MedianaSucha, MedianaMokra As Double
+   Dim GruboscKartki(), NapiecieSuchego(), NapiecieMokrego(), SucheNapiecieUzgledniajaceTransformator(), MokreNapiecieUzgledniajaceTransformator() As Double
+   Dim GruboscSrednia, PrzekladniaZnamionowa, NapiecieSrodkoweMokre, NapiecieSrodkoweSuche, WytrzymaloscElektrycznaSucha, WytrzymaloscElektrycznaMokra, MokreDoSuche, SumaGrubosci As Double
+    StalaTransformatora = 1500 / 11
+     ' Grubość kartki
+   IlePomiarowGrubosci = InputBox("Wprowadź ilość pomiaru grubości papieru :", "Ilość pomiarów grubości papieru", "Podaj liczbę całkowitą dodatnią")
+    ReDim GruboscKartki(1 To IlePomiarowGrubosci) ' Inicjalizacja tablicy na podstawie ilości pomiarów
+     For i = 1 To IlePomiarowGrubosci
+         Range("A" & i + 2).Value = i
+        Next i
+    For i = 1 To IlePomiarowGrubosci
+        GruboscKartki(i) = InputBox("Podaj grubość kartki " & i & ":", "Grubość kartki", "Podaj liczbę dodatnią")
+        Cells(i + 2, 2).Value = GruboscKartki(i) ' Wypiswanie danych w kolumnie B od B3
+         SumaGrubosci = SumaGrubosci + GruboscKartki(i) ' Dodawanie grubości do sumy
+    Next i
+    GruboscSrednia = SumaGrubosci / IlePomiarowGrubosci ' liczenie średniej grubości kartki
+   Cells(3, 3).Value = GruboscSrednia ' wpisywanie średniej do C3
+    Range("G3").Value = StalaTransformatora
+    Range("M3").Value = StalaTransformatora
+   'Pomiar such
+   IlolscPapieruSuchego = InputBox("Wprowadź ilość kartek papieru suchego:", "Ilość  kartek suchego:", "Podaj liczbę całkowitą dodatnią")
+   Cells(3, 5).Value = IlolscPapieruSuchego ' Wpisanie ilości kartek do E3
+   IlośćPomiaruSuchego = InputBox("Wprowadź ilość pomiarów napięcia papieru suchego:", "Ilość pomiarów papieru suchego:", "Podaj liczbę całkowitą dodatnią")
+   ReDim NapiecieSuchego(1 To IlolscPapieruSuchego) ' Inicjalizacja tablicy na podstawie ilości pomiarów
+   For i = 1 To IlośćPomiaruSuchego
+         Range("D" & i + 2).Value = i 'numer pomiaru w od D3
+        Next i
+    For i = 1 To IlośćPomiaruSuchego
+    NapiecieSuchego(i) = InputBox("Podaj napięcie " & i & ":", "Napięcie suche", "Podaj liczbę dodatnią")
+    Cells(i + 2, 6).Value = NapiecieSuchego(i) ' Wypisanie danych do kolumny F
+    Next i
+    ReDim SucheNapiecieUzgledniajaceTransformator(1 To IlośćPomiaruSuchego)
+    For i = 1 To IlośćPomiaruSuchego
+    SucheNapiecieUzgledniajaceTransformator(i) = NapiecieSuchego(i) * StalaTransformatora
+    Cells(i + 2, 8).Value = SucheNapiecieUzgledniajaceTransformator(i) ' Wypiswanie danych w kolumnie H od H3
+Next i
+    'mokry pomiar
+    IlolscPapieruMokrego = InputBox("Wprowadź ilość kartek papieru mokrego:", "Ilość kartek papieru mokrego:", "Podaj liczbę całkowitą dodatnią")
+Cells(3, 14).Value = IlolscPapieruMokrego ' Wpisanie ilości kartek do kolumny N
+IloscPomiaruMokrego = InputBox("Wprowadź ilość pomiarów napięcia papieru mokrego:", "Ilość pomiarów papieru mokrego:", "Podaj liczbę całkowitą dodatnią")
+ReDim NapiecieMokrego(1 To IlolscPapieruMokrego) ' Inicjalizacja tablicy na podstawie ilości pomiarów
+For i = 1 To IloscPomiaruMokrego
+    Range("L" & i + 2).Value = i ' Numeracja pomiarów w kolumnie L od L3
+Next i
+For i = 1 To IloscPomiaruMokrego
+    NapiecieMokrego(i) = InputBox("Podaj napięcie " & i & ":", "Napięcie mokre", "Podaj liczbę dodatnią")
+    Cells(i + 2, 15).Value = NapiecieMokrego(i) ' Wypisanie danych do kolumny O od O3
+Next i
+ReDim MokreNapiecieUzgledniajaceTransformator(1 To IloscPomiaruMokrego)
+For i = 1 To IloscPomiaruMokrego
+    MokreNapiecieUzgledniajaceTransformator(i) = NapiecieMokrego(i) * StalaTransformatora
+    Cells(i + 2, 17).Value = MokreNapiecieUzgledniajaceTransformator(i) ' Wypiswanie danych w kolumnie Q od Q3
+Next i
+   
+End Sub
