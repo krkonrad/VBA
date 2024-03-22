@@ -7,7 +7,19 @@ End Sub
 Sub PapierKablowy()
  'Czyszczenie arkusza przed przetwarzaniem danych
     clean
-    
+With ThisWorkbook.Sheets(1)
+    ' Scalenie komórek od A1 do C1
+    .Range("A1:C1").Merge
+    ' Ustalenie wartości grubości papieru w komórce po środku
+    .Cells(1, 1).Value = "Grubość papieru"
+    .Cells(1, 1).HorizontalAlignment = xlCenter
+    .Range("D1:J1").Merge
+    .Cells(1, 4).Value = "Papier suchy"
+    .Cells(1, 4).HorizontalAlignment = xlCenter
+    Range("L1:S1").Merge
+    .Cells(1, 12).Value = "Papier mokry"
+    .Cells(1, 12).HorizontalAlignment = xlCenter
+End With
 With ThisWorkbook.Sheets(1)
     .Cells(2, 1).Value = "Numer pomiaru"
     .Cells(2, 2).Value = "Grubość kartki paieru [mm]"
@@ -17,7 +29,7 @@ With ThisWorkbook.Sheets(1)
     .Cells(2, 6).Value = "Napięcie pierwotne [v]"
     .Cells(2, 7).Value = "Przekładnia zwojowa transformatora"
     .Cells(2, 8).Value = "Napięcie perzebicia [kV]"
-    .Cells(2, 9).Value = "Wartość środkowa napięcia przebicia [kV]"
+    .Cells(2, 9).Value = "Mediana napięcia przebicia [kV]"
     .Cells(2, 10).Value = "Wytrzymałość elektryczna [kV/mm]"
     .Columns(1).AutoFit
     .Columns(2).AutoFit
@@ -34,7 +46,7 @@ With ThisWorkbook.Sheets(1)
     .Cells(2, 14).Value = "Napięcie pierwotne [v]"
     .Cells(2, 15).Value = "Przekładnia zwojowa transformatora"
     .Cells(2, 16).Value = "Napięcie perzebicia [kV]"
-    .Cells(2, 17).Value = "Wartość środkowa napięcia przebicia [kV]"
+    .Cells(2, 17).Value = "Mediana napięcia przebicia [kV]"
     .Cells(2, 18).Value = "Wytrzymałość elektryczna [kV/mm]"
     .Columns(12).AutoFit
     .Columns(13).AutoFit
@@ -47,6 +59,7 @@ End With
    Dim IlolscPapieruMokrego, IlolscPapieruSuchego, IloscPomiaruMokrego, IlośćPomiaruSuchego, IlePomiarowGrubosci As Integer
    Dim i As Integer
    Dim MedianaSucha, MedianaMokra As Double
+   Dim WytrzymałoscSucha, WytrzymałoscMokra, Iloraz As Double
    Dim GruboscKartki(), NapiecieSuchego(), NapiecieMokrego(), SucheNapiecieUzgledniajaceTransformator(), MokreNapiecieUzgledniajaceTransformator() As Double
    Dim GruboscSrednia, PrzekladniaZnamionowa, NapiecieSrodkoweMokre, NapiecieSrodkoweSuche, WytrzymaloscElektrycznaSucha, WytrzymaloscElektrycznaMokra, MokreDoSuche, SumaGrubosci As Double
     StalaTransformatora = 1500 / 11
@@ -99,5 +112,5 @@ For i = 1 To IloscPomiaruMokrego
     MokreNapiecieUzgledniajaceTransformator(i) = NapiecieMokrego(i) * StalaTransformatora
     Cells(i + 2, 17).Value = MokreNapiecieUzgledniajaceTransformator(i) ' Wypiswanie danych w kolumnie Q od Q3
 Next i
-   
 End Sub
+
