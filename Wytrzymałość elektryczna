@@ -26,7 +26,7 @@ With ThisWorkbook.Sheets(1)
     .Cells(2, 3).Value = "Średnia Grubość kartki paieru [mm]"
     .Cells(2, 4).Value = "Numer pomiaru"
     .Cells(2, 5).Value = "Ilość warstw papieru [m]"
-    .Cells(2, 6).Value = "Napięcie pierwotne [kV]"
+    .Cells(2, 6).Value = "Napięcie pierwotne [V]"
     .Cells(2, 7).Value = "Przekładnia zwojowa transformatora"
     .Cells(2, 8).Value = "Napięcie perzebicia [kV]"
     .Cells(2, 9).Value = "Mediana napięcia przebicia [kV]"
@@ -43,7 +43,7 @@ With ThisWorkbook.Sheets(1)
     .Columns(10).AutoFit
     .Cells(2, 12).Value = "Numer pomiaru"
     .Cells(2, 13).Value = "Ilość warstw papieru [m]"
-    .Cells(2, 14).Value = "Napięcie pierwotne [kV]"
+    .Cells(2, 14).Value = "Napięcie pierwotne [V]"
     .Cells(2, 15).Value = "Przekładnia zwojowa transformatora"
     .Cells(2, 16).Value = "Napięcie perzebicia [kV]"
     .Cells(2, 17).Value = "Mediana napięcia przebicia [kV]"
@@ -110,7 +110,10 @@ Next i
     ' Zapisz medianę do komórki I3
     arkuszSuchy.Range("I3").Value = MedianaSucha
     
-    WytrzymałoscSucha = MedianaSucha \ (IlolscPapieruSuchego * GruboscSrednia)
+    Cells(20, 3).Value = MedianaSucha
+    Cells(21, 3).Value = IlolscPapieruSuchego
+    Cells(22, 3).Value = GruboscSrednia
+    WytrzymałoscSucha = MedianaSucha / (IlolscPapieruSuchego * GruboscSrednia)
     Range("J3").Value = WytrzymałoscSucha
     'mokry pomiar
     IlolscPapieruMokrego = InputBox("Wprowadź ilość kartek papieru mokrego:", "Ilość kartek papieru mokrego:", "Podaj liczbę całkowitą dodatnią")
@@ -142,8 +145,9 @@ For i = 1 To IloscPomiaruMokrego
     MedianaMokra = WorksheetFunction.median(zakresNapięćPrzebiciaMokrego)
     ' Zapisz medianę do komórki I3
     arkuszMokry.Range("Q3").Value = MedianaMokra
-    WytrzymałoscMokra = MedianaMokra \ (IloscPomiaruMokrego * GruboscSrednia)
+    WytrzymałoscMokra = MedianaMokra / (IloscPomiaruMokrego * GruboscSrednia)
     Range("R3").Value = WytrzymałoscMokra
-    Iloraz = WytrzymałoscMokra \ WytrzymałoscSucha ' Krotność przebicia
+    Iloraz = WytrzymałoscMokra / WytrzymałoscSucha ' Krotność przebicia
     Range("S3").Value = Iloraz
 End Sub
+
