@@ -26,7 +26,7 @@ With ThisWorkbook.Sheets(1)
     .Cells(2, 3).Value = "Średnia Grubość kartki paieru [mm]"
     .Cells(2, 4).Value = "Numer pomiaru"
     .Cells(2, 5).Value = "Ilość warstw papieru [m]"
-    .Cells(2, 6).Value = "Napięcie pierwotne [v]"
+    .Cells(2, 6).Value = "Napięcie pierwotne [kV]"
     .Cells(2, 7).Value = "Przekładnia zwojowa transformatora"
     .Cells(2, 8).Value = "Napięcie perzebicia [kV]"
     .Cells(2, 9).Value = "Mediana napięcia przebicia [kV]"
@@ -43,11 +43,12 @@ With ThisWorkbook.Sheets(1)
     .Columns(10).AutoFit
     .Cells(2, 12).Value = "Numer pomiaru"
     .Cells(2, 13).Value = "Ilość warstw papieru [m]"
-    .Cells(2, 14).Value = "Napięcie pierwotne [v]"
+    .Cells(2, 14).Value = "Napięcie pierwotne [kV]"
     .Cells(2, 15).Value = "Przekładnia zwojowa transformatora"
     .Cells(2, 16).Value = "Napięcie perzebicia [kV]"
     .Cells(2, 17).Value = "Mediana napięcia przebicia [kV]"
     .Cells(2, 18).Value = "Wytrzymałość elektryczna [kV/mm]"
+    .Cells(2, 19).Value = "Iloraz"
     .Columns(12).AutoFit
     .Columns(13).AutoFit
     .Columns(14).AutoFit
@@ -77,7 +78,7 @@ End With
     GruboscSrednia = SumaGrubosci / IlePomiarowGrubosci ' liczenie średniej grubości kartki
    Cells(3, 3).Value = GruboscSrednia ' wpisywanie średniej do C3
     Range("G3").Value = StalaTransformatora
-    Range("M3").Value = StalaTransformatora
+    Range("O3").Value = StalaTransformatora
    'Pomiar such
    IlolscPapieruSuchego = InputBox("Wprowadź ilość kartek papieru suchego:", "Ilość  kartek suchego:", "Podaj liczbę całkowitą dodatnią")
    Cells(3, 5).Value = IlolscPapieruSuchego ' Wpisanie ilości kartek do E3
@@ -95,9 +96,25 @@ End With
     SucheNapiecieUzgledniajaceTransformator(i) = NapiecieSuchego(i) * StalaTransformatora
     Cells(i + 2, 8).Value = SucheNapiecieUzgledniajaceTransformator(i) ' Wypiswanie danych w kolumnie H od H3
 Next i
+    Dim arkuszSuchy As Worksheet
+    Dim ostatniWierszSuchy As Long
+    Dim zakresNapięćPrzebiciaSuchego As Range
+    ' Ustaw arkusz, na którym pracujemy
+    Set arkuszSuchy = ThisWorkbook.Sheets("Arkusz1")
+    ' Znajdź ostatni wiersz w kolumnie H
+    ostatniWierszSuchy = arkuszSuchy.Cells(arkuszSuchy.Rows.Count, "H").End(xlUp).Row
+    ' Zdefiniuj zakres wartości napięcia przebicia
+    Set zakresNapięćPrzebiciaSuchego = arkuszSuchy.Range("H2:H" & ostatniWierszSuchy)
+    ' Oblicz medianę wartości napięcia przebicia
+    MedianaSucha = WorksheetFunction.median(zakresNapięćPrzebiciaSuchego)
+    ' Zapisz medianę do komórki I3
+    arkuszSuchy.Range("I3").Value = MedianaSucha
+    
+    WytrzymałoscSucha = MedianaSucha \ (IlolscPapieruSuchego * GruboscSrednia)
+    Range("J3").Value = WytrzymałoscSucha
     'mokry pomiar
     IlolscPapieruMokrego = InputBox("Wprowadź ilość kartek papieru mokrego:", "Ilość kartek papieru mokrego:", "Podaj liczbę całkowitą dodatnią")
-Cells(3, 14).Value = IlolscPapieruMokrego ' Wpisanie ilości kartek do kolumny N
+Cells(3, 13).Value = IlolscPapieruMokrego ' Wpisanie ilości kartek do kolumny N
 IloscPomiaruMokrego = InputBox("Wprowadź ilość pomiarów napięcia papieru mokrego:", "Ilość pomiarów papieru mokrego:", "Podaj liczbę całkowitą dodatnią")
 ReDim NapiecieMokrego(1 To IlolscPapieruMokrego) ' Inicjalizacja tablicy na podstawie ilości pomiarów
 For i = 1 To IloscPomiaruMokrego
@@ -105,12 +122,28 @@ For i = 1 To IloscPomiaruMokrego
 Next i
 For i = 1 To IloscPomiaruMokrego
     NapiecieMokrego(i) = InputBox("Podaj napięcie " & i & ":", "Napięcie mokre", "Podaj liczbę dodatnią")
-    Cells(i + 2, 15).Value = NapiecieMokrego(i) ' Wypisanie danych do kolumny O od O3
+    Cells(i + 2, 14).Value = NapiecieMokrego(i) ' Wypisanie danych do kolumny O od O3
 Next i
 ReDim MokreNapiecieUzgledniajaceTransformator(1 To IloscPomiaruMokrego)
 For i = 1 To IloscPomiaruMokrego
     MokreNapiecieUzgledniajaceTransformator(i) = NapiecieMokrego(i) * StalaTransformatora
-    Cells(i + 2, 17).Value = MokreNapiecieUzgledniajaceTransformator(i) ' Wypiswanie danych w kolumnie Q od Q3
-Next i
+    Cells(i + 2, 16).Value = MokreNapiecieUzgledniajaceTransformator(i) ' Wypiswanie danych w kolumnie Q od Q3
+    Next i
+    Dim arkuszMokry As Worksheet
+    Dim ostatniWierszMokry As Long
+    Dim zakresNapięćPrzebiciaMokrego As Range
+    ' Ustaw arkusz, na którym pracujemy
+    Set arkuszMokry = ThisWorkbook.Sheets("Arkusz1")
+    ' Znajdź ostatni wiersz w kolumnie P
+    ostatniWierszMokry = arkuszMokry.Cells(arkuszMokry.Rows.Count, "P").End(xlUp).Row
+    ' Zdefiniuj zakres wartości napięcia przebicia
+    Set zakresNapięćPrzebiciaMokrego = arkuszMokry.Range("P2:P" & ostatniWierszMokry)
+    ' Oblicz medianę wartości napięcia przebicia
+    MedianaMokra = WorksheetFunction.median(zakresNapięćPrzebiciaMokrego)
+    ' Zapisz medianę do komórki I3
+    arkuszMokry.Range("Q3").Value = MedianaMokra
+    WytrzymałoscMokra = MedianaMokra \ (IloscPomiaruMokrego * GruboscSrednia)
+    Range("R3").Value = WytrzymałoscMokra
+    Iloraz = WytrzymałoscMokra \ WytrzymałoscSucha ' Krotność przebicia
+    Range("S3").Value = Iloraz
 End Sub
-
