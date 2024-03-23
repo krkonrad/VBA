@@ -1,18 +1,61 @@
-Sub clean()
-    Dim ws As Worksheet
-    For Each ws In ThisWorkbook.Worksheets
-        ws.Cells.Clear
-    Next ws
-End Sub
-
 Sub OlejTransformatorowy()
- 'Czyszczenie arkusza przed przetwarzaniem danych
-    clean
-    ' Dodanie nazw kolumn
-    With ThisWorkbook.Sheets(1)
-        .Cells(1, 1).Value = "Numer pomiaru"
-        .Cells(1, 2).Value = "Wartość pomiaru [kV]"
-        .Cells(1, 3).Value = "Wartość średnia pomiaru [kV]"
+ '---------------------Czyszczenie arkusza przed przetwarzaniem danych------------------------
+    Dim ws As Worksheet
+    
+    ' Określ indeks arkusza, który chcesz wyczyścić
+    Dim indeks As Integer
+    indeks = 2 ' Zmień na właściwy indeks arkusza
+    
+    ' Sprawdź, czy indeks arkusza jest ważny
+    If indeks >= 1 And indeks <= ThisWorkbook.Worksheets.Count Then
+        ' Pobierz arkusz na podstawie indeksu
+        Set ws = ThisWorkbook.Worksheets(indeks)
+        
+    Else
+        MsgBox "Nieprawidłowy indeks arkusza."
+    End If
+    
+      Dim odpowiedz As VbMsgBoxResult
+
+    ' Pytamy użytkownika, czy chce wyczyścić arkusz
+    odpowiedz = MsgBox("Czy chcesz wyczyścić arkusz przed przetwarzaniem danych?", vbYesNo + vbQuestion, "Potwierdzenie")
+
+    ' Jeśli użytkownik wybierze Tak, wyczyść arkusz
+    If odpowiedz = vbYes Then
+        ' Wyczyść zawartość bieżącego arkusza
+        Set ws = ThisWorkbook.ActiveSheet
+        ws.Cells.Clear
+        MsgBox "Arkusz został wyczyszczony.", vbInformation
+    ElseIf odpowiedz = vbNo Then
+        MsgBox "To są aktualne dane.", vbInformation
+    End If
+
+    ' Sprawdzamy, czy arkusz jest pusty
+    If WorksheetFunction.CountA(ws.Cells) = 0 Then
+        MsgBox "Arkusz jest pusty.", vbInformation
+    Else
+        ' Wyświetlamy bieżący stan arkusza
+        ws.Activate ' Aktywujemy arkusz, aby był widoczny dla użytkownika
+    End If
+    ' ------------------------------------------MAIN CODE-----------------------------------------
+    Dim userInput As String
+    Do
+        userInput = InputBox("Wprowadź ilość miejsc po przecinku dla pomiarów:", "Ilość miejsc", "Podaj liczbę całkowitą dodatnią")
+        ' Sprawdzenie, czy użytkownik anulował InputBox
+        If userInput = "" Then Exit Sub
+        ' Sprawdzenie, czy podano liczbę całkowitą dodatnią
+        If IsNumeric(userInput) And Val(userInput) > 0 And Int(userInput) = userInput Then
+            AmountOfDigits = CInt(userInput)
+            Exit Do ' Jeśli warunek jest spełniony, wyjdź z pętli
+           
+        Else
+            MsgBox "Podano niepoprawną wartość. Podaj liczbę całkowitą dodatnią."
+        End If
+    Loop
+    With ThisWorkbook.Sheets(2)
+        .Cells(1, 1).Value = "L.p."
+        .Cells(1, 2).Value = "Wartość napięcia przebicia [kV}"
+        .Cells(1, 3).Value = "Wartość średnia napięcia przebicia [kV}"
         .Cells(1, 4).Value = "Średnie odchylenie standardowe [kV]"
         .Cells(1, 5).Value = "Względne odchylenie standardowe [%]"
         
@@ -22,12 +65,15 @@ Sub OlejTransformatorowy()
         .Columns(3).AutoFit
         .Columns(4).AutoFit
         .Columns(5).AutoFit
+        .Columns(3).NumberFormat = "0." & String(AmountOfDigits, "0")
+        .Columns(4).NumberFormat = "0." & String(AmountOfDigits, "0")
+        .Columns(5).NumberFormat = "0." & String(AmountOfDigits, "0")
+        
     End With
     Dim ScoursOfMeasurement() As Double
     Dim AverageOfVoltage, sum, varianceSum, AverageStandardVariation, RelativeStandardDeviation As Double
     Dim AmountOfMeasurement As Integer
     Dim i As Integer
-    Dim userInput As String
    
     Do
         userInput = InputBox("Wprowadź ilość pomiarów:", "Ilość pomiarów napięcia przebicia oleju transformatorowego", "Podaj liczbę całkowitą dodatnią")
@@ -58,6 +104,26 @@ Sub OlejTransformatorowy()
     For i = 1 To AmountOfMeasurement
         sum = sum + ScoursOfMeasurement(i)
     Next i
+    
+' Scalanie komórek
+
+    Dim zakres As Range
+    ' Określ zakres komórek, które chcesz scalić
+    Set zakres = ThisWorkbook.Worksheets(2).Range("C2:C" & AmountOfMeasurement + 1) ' Zmień "Arkusz1" na nazwę swojego arkusza i "A1:B2" na odpowiedni zakres
+    With zakres
+        .MergeCells = True
+        .VerticalAlignment = xlCenter
+    End With
+    Set zakres = ThisWorkbook.Worksheets(2).Range("D2:D" & AmountOfMeasurement + 1) ' Zmień "Arkusz1" na nazwę swojego arkusza i "A1:B2" na odpowiedni zakres
+    With zakres
+        .MergeCells = True
+        .VerticalAlignment = xlCenter
+    End With
+    Set zakres = ThisWorkbook.Worksheets(2).Range("E2:E" & AmountOfMeasurement + 1) ' Zmień "Arkusz1" na nazwę swojego arkusza i "A1:B2" na odpowiedni zakres
+    With zakres
+        .MergeCells = True
+        .VerticalAlignment = xlCenter
+    End With
 ' Obliczenie średniej
     AverageOfVoltage = sum / AmountOfMeasurement
     Range("C2").Value = AverageOfVoltage
@@ -73,3 +139,4 @@ Sub OlejTransformatorowy()
             RelativeStandardDeviation = (AverageOfVoltage / AverageStandardVariation) * 100
         Range("E2").Value = RelativeStandardDeviation
 End Sub
+
