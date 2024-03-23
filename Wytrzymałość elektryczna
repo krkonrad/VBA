@@ -1,30 +1,80 @@
-Sub clean()
-    Dim ws As Worksheet
-    For Each ws In ThisWorkbook.Worksheets
-        ws.Cells.Clear
-    Next ws
-End Sub
 Sub PapierKablowy()
- 'Czyszczenie arkusza przed przetwarzaniem danych
-    clean
+ '---------------------Czyszczenie arkusza przed przetwarzaniem danych------------------------
+    Dim ws As Worksheet
+    
+    ' Określ indeks arkusza, który chcesz wyczyścić
+    Dim indeks As Integer
+    indeks = 1 ' Zmień na właściwy indeks arkusza
+    
+    ' Sprawdź, czy indeks arkusza jest ważny
+    If indeks >= 1 And indeks <= ThisWorkbook.Worksheets.Count Then
+        ' Pobierz arkusz na podstawie indeksu
+        Set ws = ThisWorkbook.Worksheets(indeks)
+    Else
+        MsgBox "Nieprawidłowy indeks arkusza."
+    End If
+    Dim odpowiedz As VbMsgBoxResult
+
+    ' Pytamy użytkownika, czy chce wyczyścić arkusz
+    odpowiedz = MsgBox("Czy chcesz wyczyścić arkusz przed przetwarzaniem danych?", vbYesNo + vbQuestion, "Potwierdzenie")
+
+    ' Jeśli użytkownik wybierze Tak, wyczyść arkusz
+    If odpowiedz = vbYes Then
+        ' Wyczyść zawartość bieżącego arkusza
+        Set ws = ThisWorkbook.ActiveSheet
+        ws.Cells.Clear
+        MsgBox "Arkusz został wyczyszczony.", vbInformation
+    ElseIf odpowiedz = vbNo Then
+        MsgBox "To są aktualne dane.", vbInformation
+    End If
+
+    ' Sprawdzamy, czy arkusz jest pusty
+    If WorksheetFunction.CountA(ws.Cells) = 0 Then
+        MsgBox "Arkusz jest pusty.", vbInformation
+    Else
+        ' Wyświetlamy bieżący stan arkusza
+        ws.Activate ' Aktywujemy arkusz, aby był widoczny dla użytkownika
+    End If
+    
+    ' ------------------------------------------MAIN CODE-----------------------------------------
+    Dim userInput As String
+    Do
+        userInput = InputBox("Wprowadź ilość miejsc po przecinku dla wyników obliczanych na podstawiwe pomiarów:", "Ilość miejsc", "Podaj liczbę całkowitą dodatnią")
+        ' Sprawdzenie, czy użytkownik anulował InputBox
+        If userInput = "" Then Exit Sub
+        ' Sprawdzenie, czy podano liczbę całkowitą dodatnią
+        If IsNumeric(userInput) And Val(userInput) > 0 And Int(userInput) = userInput Then
+            AmountOfDigits = CInt(userInput)
+            Exit Do ' Jeśli warunek jest spełniony, wyjdź z pętli
+           
+        Else
+            MsgBox "Podano niepoprawną wartość. Podaj liczbę całkowitą dodatnią."
+        End If
+    Loop
 With ThisWorkbook.Sheets(1)
     ' Scalenie komórek od A1 do C1
-    .Range("A1:C1").Merge
+    .Range("A1:A2").Merge
+    .Range("B1:C1").Merge
     ' Ustalenie wartości grubości papieru w komórce po środku
-    .Cells(1, 1).Value = "Grubość papieru"
-    .Cells(1, 1).HorizontalAlignment = xlCenter
-    .Range("D1:J1").Merge
-    .Cells(1, 4).Value = "Papier suchy"
-    .Cells(1, 4).HorizontalAlignment = xlCenter
-    Range("L1:S1").Merge
-    .Cells(1, 12).Value = "Papier mokry"
-    .Cells(1, 12).HorizontalAlignment = xlCenter
+    .Cells(1, 2).Value = "Grubość papieru"
+    .Cells(1, 2).HorizontalAlignment = xlCenter
+    .Cells(1, 1).VerticalAlignment = xlCenter
+    .Range("D1:D2").Merge
+    .Range("E1:J1").Merge
+    .Cells(1, 5).Value = "Papier suchy"
+    .Cells(1, 5).HorizontalAlignment = xlCenter
+    .Cells(1, 4).VerticalAlignment = xlCenter
+    Range("L1:L2").Merge
+    Range("M1:S1").Merge
+    .Cells(1, 13).Value = "Papier mokry"
+    .Cells(1, 13).HorizontalAlignment = xlCenter
+    .Cells(1, 12).VerticalAlignment = xlCenter
 End With
 With ThisWorkbook.Sheets(1)
-    .Cells(2, 1).Value = "Numer pomiaru"
+    .Cells(1, 1).Value = "Lp."
     .Cells(2, 2).Value = "Grubość kartki paieru [mm]"
     .Cells(2, 3).Value = "Średnia Grubość kartki paieru [mm]"
-    .Cells(2, 4).Value = "Numer pomiaru"
+    .Cells(1, 4).Value = "Lp."
     .Cells(2, 5).Value = "Ilość warstw papieru [m]"
     .Cells(2, 6).Value = "Napięcie pierwotne [V]"
     .Cells(2, 7).Value = "Przekładnia zwojowa transformatora"
@@ -41,7 +91,7 @@ With ThisWorkbook.Sheets(1)
     .Columns(8).AutoFit
     .Columns(9).AutoFit
     .Columns(10).AutoFit
-    .Cells(2, 12).Value = "Numer pomiaru"
+    .Cells(1, 12).Value = "Lp."
     .Cells(2, 13).Value = "Ilość warstw papieru [m]"
     .Cells(2, 14).Value = "Napięcie pierwotne [V]"
     .Cells(2, 15).Value = "Przekładnia zwojowa transformatora"
@@ -56,6 +106,14 @@ With ThisWorkbook.Sheets(1)
     .Columns(16).AutoFit
     .Columns(17).AutoFit
     .Columns(18).AutoFit
+    .Columns(3).NumberFormat = "0." & String(AmountOfDigits, "0")
+    .Columns(8).NumberFormat = "0." & String(AmountOfDigits, "0")
+    .Columns(9).NumberFormat = "0." & String(AmountOfDigits, "0")
+    .Columns(10).NumberFormat = "0." & String(AmountOfDigits, "0")
+    .Columns(16).NumberFormat = "0." & String(AmountOfDigits, "0")
+    .Columns(17).NumberFormat = "0." & String(AmountOfDigits, "0")
+    .Columns(18).NumberFormat = "0." & String(AmountOfDigits, "0")
+    .Columns(19).NumberFormat = "0." & String(AmountOfDigits, "0")
 End With
    Dim IlolscPapieruMokrego, IlolscPapieruSuchego, IloscPomiaruMokrego, IlośćPomiaruSuchego, IlePomiarowGrubosci As Integer
    Dim i As Integer
@@ -75,12 +133,32 @@ End With
         Cells(i + 2, 2).Value = GruboscKartki(i) ' Wypiswanie danych w kolumnie B od B3
          SumaGrubosci = SumaGrubosci + GruboscKartki(i) ' Dodawanie grubości do sumy
     Next i
+
     GruboscSrednia = SumaGrubosci / IlePomiarowGrubosci ' liczenie średniej grubości kartki
-   Cells(3, 3).Value = GruboscSrednia ' wpisywanie średniej do C3
-    Range("G3").Value = StalaTransformatora
-    Range("O3").Value = StalaTransformatora
+With ThisWorkbook.Sheets(1)
+    .Range("C3:C" & IlePomiarowGrubosci + 2).Merge
+    .Cells(3, 3).HorizontalAlignment = xlCenter
+    .Cells(3, 3).VerticalAlignment = xlCenter
+End With
+    Cells(3, 3).Value = GruboscSrednia ' wpisywanie średniej do C3
+    Range("G3").Value = "30000 / 220"
+    Range("O3").Value = "30000 / 220"
    'Pomiar such
    IlolscPapieruSuchego = InputBox("Wprowadź ilość kartek papieru suchego:", "Ilość  kartek suchego:", "Podaj liczbę całkowitą dodatnią")
+With ThisWorkbook.Sheets(1)
+    .Range("E3:E" & IlolscPapieruSuchego + 2).Merge
+    .Cells(3, 5).HorizontalAlignment = xlCenter
+    .Cells(3, 5).VerticalAlignment = xlCenter
+    .Range("G3:G" & IlolscPapieruSuchego + 2).Merge
+    .Cells(3, 7).HorizontalAlignment = xlCenter
+    .Cells(3, 7).VerticalAlignment = xlCenter
+    .Range("I3:I" & IlolscPapieruSuchego + 2).Merge
+    .Cells(3, 9).HorizontalAlignment = xlCenter
+    .Cells(3, 9).VerticalAlignment = xlCenter
+    .Range("J3:J" & IlolscPapieruSuchego + 2).Merge
+    .Cells(3, 10).HorizontalAlignment = xlCenter
+    .Cells(3, 10).VerticalAlignment = xlCenter
+End With
    Cells(3, 5).Value = IlolscPapieruSuchego ' Wpisanie ilości kartek do E3
    IlośćPomiaruSuchego = InputBox("Wprowadź ilość pomiarów napięcia papieru suchego:", "Ilość pomiarów papieru suchego:", "Podaj liczbę całkowitą dodatnią")
    ReDim NapiecieSuchego(1 To IlolscPapieruSuchego) ' Inicjalizacja tablicy na podstawie ilości pomiarów
@@ -106,17 +184,31 @@ Next i
     ' Zdefiniuj zakres wartości napięcia przebicia
     Set zakresNapięćPrzebiciaSuchego = arkuszSuchy.Range("H2:H" & ostatniWierszSuchy)
     ' Oblicz medianę wartości napięcia przebicia
-    MedianaSucha = WorksheetFunction.median(zakresNapięćPrzebiciaSuchego)
+    MedianaSucha = WorksheetFunction.Median(zakresNapięćPrzebiciaSuchego)
     ' Zapisz medianę do komórki I3
     arkuszSuchy.Range("I3").Value = MedianaSucha
-    
-    Cells(20, 3).Value = MedianaSucha
-    Cells(21, 3).Value = IlolscPapieruSuchego
-    Cells(22, 3).Value = GruboscSrednia
+
     WytrzymałoscSucha = MedianaSucha / (IlolscPapieruSuchego * GruboscSrednia)
     Range("J3").Value = WytrzymałoscSucha
     'mokry pomiar
     IlolscPapieruMokrego = InputBox("Wprowadź ilość kartek papieru mokrego:", "Ilość kartek papieru mokrego:", "Podaj liczbę całkowitą dodatnią")
+With ThisWorkbook.Sheets(1)
+    .Range("M3:M" & IlolscPapieruSuchego + 2).Merge
+    .Cells(3, 13).HorizontalAlignment = xlCenter
+    .Cells(3, 13).VerticalAlignment = xlCenter
+    .Range("O3:O" & IlolscPapieruSuchego + 2).Merge
+    .Cells(3, 15).HorizontalAlignment = xlCenter
+    .Cells(3, 15).VerticalAlignment = xlCenter
+    .Range("Q3:Q" & IlolscPapieruSuchego + 2).Merge
+    .Cells(3, 17).HorizontalAlignment = xlCenter
+    .Cells(3, 17).VerticalAlignment = xlCenter
+    .Range("R3:R" & IlolscPapieruSuchego + 2).Merge
+    .Cells(3, 18).HorizontalAlignment = xlCenter
+    .Cells(3, 18).VerticalAlignment = xlCenter
+    .Range("S3:S" & IlolscPapieruSuchego + 2).Merge
+    .Cells(3, 19).HorizontalAlignment = xlCenter
+    .Cells(3, 19).VerticalAlignment = xlCenter
+End With
 Cells(3, 13).Value = IlolscPapieruMokrego ' Wpisanie ilości kartek do kolumny N
 IloscPomiaruMokrego = InputBox("Wprowadź ilość pomiarów napięcia papieru mokrego:", "Ilość pomiarów papieru mokrego:", "Podaj liczbę całkowitą dodatnią")
 ReDim NapiecieMokrego(1 To IlolscPapieruMokrego) ' Inicjalizacja tablicy na podstawie ilości pomiarów
@@ -142,7 +234,7 @@ For i = 1 To IloscPomiaruMokrego
     ' Zdefiniuj zakres wartości napięcia przebicia
     Set zakresNapięćPrzebiciaMokrego = arkuszMokry.Range("P2:P" & ostatniWierszMokry)
     ' Oblicz medianę wartości napięcia przebicia
-    MedianaMokra = WorksheetFunction.median(zakresNapięćPrzebiciaMokrego)
+    MedianaMokra = WorksheetFunction.Median(zakresNapięćPrzebiciaMokrego)
     ' Zapisz medianę do komórki I3
     arkuszMokry.Range("Q3").Value = MedianaMokra
     WytrzymałoscMokra = MedianaMokra / (IloscPomiaruMokrego * GruboscSrednia)
@@ -150,4 +242,5 @@ For i = 1 To IloscPomiaruMokrego
     Iloraz = WytrzymałoscMokra / WytrzymałoscSucha ' Krotność przebicia
     Range("S3").Value = Iloraz
 End Sub
+
 
